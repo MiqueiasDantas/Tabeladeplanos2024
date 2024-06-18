@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparador de Planos de Saúde</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #302208;
+        }
+        #calculator {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(189, 27, 27, 0.1);
+        }
+        input[type="number"] {
+            width: 100px;
+            padding: 8px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 35px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #007bff;
+            
+        }
+        th {
+            background-color: #cbe9f5;
+        }
+        .best-option {
+            font-weight: bold;
+            color: rgb(15, 196, 15);
+        }
+    </style>
+</head>
+<body>
+    <div id="calculator">
+        <h2>Comparador de Planos de Saúde</h2>
+        <label for="age">Idade:</label>
+        <input type="number" id="age" min="0" required>
+        <label for="weight">Peso (kg):</label>
+        <input type="number" id="weight" min="0" required>
+        <label for="height">Altura (cm):</label>
+        <input type="number" id="height" min="0" required>
+        <button onclick="calculate()">Calcular</button>
+        <button onclick="Voltar">Voltar</button>
+        <div id="result"></div>
+    
+    </div>
+
+    <script>
+        function calculate() {
+            const age = parseInt(document.getElementById('age').value);
+            const weight = parseInt(document.getElementById('weight').value);
+            const height = parseInt(document.getElementById('height').value) / 100;
+            const bmi = weight / (height * height);
+
+            const planA = calculatePlanA(age, bmi);
+            const planB = calculatePlanB(bmi);
+
+            displayResults(planA, planB);
+        }
+
+        function calculatePlanA(age, bmi) {
+            const basicPrice = 100 + (age * 10 * (bmi / 10));
+            const standardPrice = (150 + (age * 15)) * (bmi / 10);
+            const premiumPrice = (200 - (bmi * 10) + (age * 20)) * (bmi / 10);
+            return { basicPrice, standardPrice, premiumPrice };
+        }
+
+        function calculatePlanB(bmi) {
+            let comorbidityFactor;
+            if (bmi < 18.5) {
+                comorbidityFactor = 10;
+            } else if (bmi >= 18.5 && bmi < 25) {
+                comorbidityFactor = 1;s
+            } else if (bmi >= 25 && bmi < 30) {
+                comorbidityFactor = 6;
+            } else if (bmi >= 30 && bmi < 35) {
+                comorbidityFactor = 10;
+            } else if (bmi >= 35 && bmi < 40) {
+                comorbidityFactor = 20;
+            } else {
+                comorbidityFactor = 30;
+            }
+
+            const basicPrice = 100 + (comorbidityFactor * 10 * (bmi / 10));
+            const standardPrice = (150 + (comorbidityFactor * 15)) * (bmi / 10);
+            const premiumPrice = (200 - (bmi * 10) + (comorbidityFactor * 20)) * (bmi / 10);
+            return { basicPrice, standardPrice, premiumPrice };
+        }
+
+        function displayResults(planA, planB) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <h3>Operadora de Saúde A</h3>
+                <table>
+                    <tr>
+                        <th>Plano</th>
+                        <th>Preço</th>
+                    </tr>
+                    <tr ${planA.basicPrice < planA.standardPrice && planA.basicPrice < planA.premiumPrice ? 'class="best-option"' : ''}>
+                        <td>Básico</td>
+                        <td>R$ ${planA.basicPrice.toFixed(2)}</td>
+                    </tr>
+                    <tr ${planA.standardPrice < planA.basicPrice && planA.standardPrice < planA.premiumPrice ? 'class="best-option"' : ''}>
+                        <td>Standard</td>
+                        <td>R$ ${planA.standardPrice.toFixed(2)}</td>
+                    </tr>
+                    <tr ${planA.premiumPrice < planA.basicPrice && planA.premiumPrice < planA.standardPrice ? 'class="best-option"' : ''}>
+                        <td>Premium</td>
+                        <td>R$ ${planA.premiumPrice.toFixed(2)}</td>
+                    </tr>
+                </table>
+
+                <h3>Operadora de Saúde B</h3>
+                <table>
+                    <tr>
+                        <th>Plano</th>
+                        <th>Preço</th>
+                    </tr>
+                    <tr ${planB.basicPrice < planB.standardPrice && planB.basicPrice < planB.premiumPrice ? 'class="best-option"' : ''}>
+                        <td>Básico</td>
+                        <td>R$ ${planB.basicPrice.toFixed(2)}</td>
+                    </tr>
+                    <tr ${planB.standardPrice < planB.basicPrice && planB.standardPrice < planB.premiumPrice ? 'class="best-option"' : ''}>
+                        <td>Standard</td>
+                        <td>R$ ${planB.standardPrice.toFixed(2)}</td>
+                    </tr>
+                    <tr ${planB.premiumPrice < planB.basicPrice && planB.premiumPrice < planB.standardPrice ? 'class="best-option"' : ''}>
+                        <td>Premium</td>
+                        <td>R$ ${planB.premiumPrice.toFixed(2)}</td>
+                    </tr>
+                </table>
+            `;
+        }
+    </script>
+</body>
+</html>
